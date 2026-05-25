@@ -84,6 +84,21 @@ def run_ui():
             font-size: 0.95rem;
         }
 
+        .scroll-cue {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 1rem;
+            margin-top: 1rem;
+            margin-bottom: 2rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.4; }
+            50% { opacity: 1; }
+            100% { opacity: 0.4; }
+        }
+
         </style>
         """,
         unsafe_allow_html=True
@@ -241,6 +256,19 @@ def run_ui():
                 """,
                 unsafe_allow_html=True
             )
+
+    # ---------------------------------------------------
+    # SCROLL CUE
+    # ---------------------------------------------------
+
+    st.markdown(
+        """
+        <div class="scroll-cue">
+        ↓ Scroll down to continue setup and start the operational assessment ↓
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
     # ---------------------------------------------------
     # TIER SELECTION
