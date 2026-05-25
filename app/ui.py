@@ -22,6 +22,15 @@ def run_ui():
         st.session_state.show_guidance = True
 
     # ---------------------------------------------------
+    # PAGE CONFIG
+    # ---------------------------------------------------
+
+    st.set_page_config(
+        page_title="Cutover Intelligence",
+        layout="wide"
+    )
+
+    # ---------------------------------------------------
     # GLOBAL STYLE
     # ---------------------------------------------------
 
@@ -38,23 +47,30 @@ def run_ui():
             font-weight: 700;
             color: white;
             margin-bottom: 0.5rem;
+            line-height: 1.1;
         }
 
         .main-subtitle {
             color: #94a3b8;
+            font-size: 1.1rem;
             margin-bottom: 2rem;
+            max-width: 1100px;
+            line-height: 1.6;
         }
 
         .onboarding-card {
 
             background: #0f172a;
+
             border: 1px solid #334155;
+
             border-radius: 18px;
 
             padding: 2rem;
 
-            box-shadow: 0px 0px 45px rgba(0,0,0,0.45);
+            box-shadow: 0px 0px 45px rgba(0,0,0,0.35);
 
+            margin-top: 1rem;
             margin-bottom: 2rem;
         }
 
@@ -68,48 +84,71 @@ def run_ui():
         .card-subtitle {
             color: #94a3b8;
             margin-bottom: 1.5rem;
+            font-size: 1rem;
         }
 
         .guidance-banner {
+
             background: rgba(59,130,246,0.12);
+
             border: 1px solid rgba(59,130,246,0.35);
+
             color: #dbeafe;
 
             padding: 1rem;
+
             border-radius: 12px;
 
             font-size: 1rem;
+
             font-weight: 600;
 
             margin-bottom: 1.5rem;
         }
 
         .section-header {
+
             color: white;
+
             font-size: 1.05rem;
+
             font-weight: 700;
-            margin-top: 1.3rem;
+
+            margin-top: 1.5rem;
+
             margin-bottom: 0.5rem;
         }
 
         .section-body {
+
             color: #d1d5db;
-            line-height: 1.7;
-            font-size: 0.95rem;
+
+            line-height: 1.8;
+
+            font-size: 0.96rem;
         }
 
         .scroll-cue {
+
             text-align: center;
+
             color: #94a3b8;
+
             font-size: 1rem;
+
             margin-top: 1rem;
+
             margin-bottom: 2rem;
+
             animation: pulse 2s infinite;
         }
 
         @keyframes pulse {
+
             0% { opacity: 0.4; }
+
             50% { opacity: 1; }
+
             100% { opacity: 0.4; }
         }
 
@@ -119,31 +158,31 @@ def run_ui():
     )
 
     # ---------------------------------------------------
-    # PAGE HEADER
+    # HEADER
     # ---------------------------------------------------
 
     st.markdown(
         """
         <div class="main-title">
-        Operational Exposure Snapshot
+        Detect Transformation Fragility Before Go-Live Failure
         </div>
 
         <div class="main-subtitle">
-        Evidence-first operational intelligence for complex transformations and cutovers.
+
+        Surface hidden operational, governance, and execution risks before they escalate into delays, rollback events, outages, or transformation failure.
+
         </div>
         """,
         unsafe_allow_html=True
     )
 
     # ---------------------------------------------------
-    # ONBOARDING CARD
+    # ONBOARDING / INTRODUCTION
     # ---------------------------------------------------
 
     if st.session_state.show_guidance:
 
-        onboarding_container = st.container(border=False)
-
-        with onboarding_container:
+        with st.container():
 
             st.markdown(
                 """
@@ -155,15 +194,17 @@ def run_ui():
             st.markdown(
                 """
                 <div class="guidance-banner">
+
                 👇 Read this quick introduction, then click the ✕ in the top-right corner to start using the platform.
+
                 </div>
                 """,
                 unsafe_allow_html=True
             )
 
-            top_col1, top_col2 = st.columns([20, 1])
+            intro_col1, intro_col2 = st.columns([20, 1])
 
-            with top_col1:
+            with intro_col1:
 
                 st.markdown(
                     """
@@ -178,12 +219,51 @@ def run_ui():
                     unsafe_allow_html=True
                 )
 
-            with top_col2:
+            with intro_col2:
 
-                if st.button("✕", key="close_intro"):
+                if st.button("✕", key="close_guidance"):
 
                     st.session_state.show_guidance = False
                     st.rerun()
+
+            # ---------------------------------------------------
+            # WHY ORGANIZATIONS USE THIS
+            # ---------------------------------------------------
+
+            st.markdown(
+                """
+                <div class="section-header">
+                WHY ORGANIZATIONS USE CUTOVER INTELLIGENCE
+                </div>
+
+                <div class="section-body">
+
+                Large transformations often fail because critical operational signals remain fragmented across spreadsheets, RAID logs, readiness reporting, escalation chains, governance layers, and operational discussions.
+
+                <br><br>
+
+                By the time leadership sees the full picture:
+
+                <br><br>
+
+                • rollback windows are shrinking<br>
+                • dependencies are already unstable<br>
+                • business readiness diverges from reporting<br>
+                • escalation paths become overloaded<br>
+                • operational exposure has already materially increased
+
+                <br><br>
+
+                Cutover Intelligence consolidates fragmented operational evidence into a single operational exposure assessment before failures escalate into outages, delays, governance breakdown, or transformation paralysis.
+
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+            # ---------------------------------------------------
+            # WHAT THIS PLATFORM DOES
+            # ---------------------------------------------------
 
             st.markdown(
                 """
@@ -192,14 +272,60 @@ def run_ui():
                 </div>
 
                 <div class="section-body">
+
                 This platform analyzes operational evidence from complex transformations and cutovers to surface recurring operational fragility, dependency instability, rollback uncertainty, escalation patterns, readiness inconsistencies, and execution coherence risks across fragmented operational artifacts.
+
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+            # ---------------------------------------------------
+            # WITHOUT THIS VISIBILITY
+            # ---------------------------------------------------
+
+            st.markdown(
+                """
+                <div class="section-header">
+                WITHOUT THIS VISIBILITY
                 </div>
 
+                <div class="section-body">
+
+                Organizations often detect serious transformation fragility too late.
+
+                <br><br>
+
+                Typical consequences include:
+
+                <br><br>
+
+                • failed go-lives<br>
+                • delayed deployments<br>
+                • rollback events<br>
+                • operational disruption<br>
+                • leadership blind spots<br>
+                • governance escalation failures<br>
+                • cross-stream coordination collapse<br>
+                • expensive operational firefighting
+
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+            # ---------------------------------------------------
+            # SUPPORTED SCENARIOS
+            # ---------------------------------------------------
+
+            st.markdown(
+                """
                 <div class="section-header">
                 SUPPORTED TRANSFORMATION SCENARIOS
                 </div>
 
                 <div class="section-body">
+
                 • SAP cutovers<br>
                 • ERP transformations<br>
                 • cloud migration cutovers<br>
@@ -207,13 +333,49 @@ def run_ui():
                 • infrastructure transitions<br>
                 • major operational release waves<br>
                 • multi-stream transformation programs
+
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+            # ---------------------------------------------------
+            # INTENDED FOR
+            # ---------------------------------------------------
+
+            st.markdown(
+                """
+                <div class="section-header">
+                INTENDED FOR
                 </div>
 
+                <div class="section-body">
+
+                • transformation leadership<br>
+                • PMO and governance teams<br>
+                • SAP / ERP transformation programs<br>
+                • cutover managers<br>
+                • operational readiness teams<br>
+                • enterprise migration leadership<br>
+                • executive transformation oversight
+
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+            # ---------------------------------------------------
+            # EVIDENCE TYPES
+            # ---------------------------------------------------
+
+            st.markdown(
+                """
                 <div class="section-header">
                 RECOMMENDED OPERATIONAL EVIDENCE
                 </div>
 
                 <div class="section-body">
+
                 • RAID logs<br>
                 • dependency registers<br>
                 • risk registers<br>
@@ -224,23 +386,45 @@ def run_ui():
                 • operational spreadsheets<br>
                 • screenshots and exports<br>
                 • governance reporting extracts
-                </div>
 
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+            # ---------------------------------------------------
+            # FILE TYPES
+            # ---------------------------------------------------
+
+            st.markdown(
+                """
                 <div class="section-header">
                 SUPPORTED FILE TYPES
                 </div>
 
                 <div class="section-body">
+
                 • XLSX / CSV<br>
                 • DOCX / PPTX / PDF / TXT<br>
                 • PNG / JPG / JPEG
-                </div>
 
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+            # ---------------------------------------------------
+            # PRIVACY
+            # ---------------------------------------------------
+
+            st.markdown(
+                """
                 <div class="section-header">
                 PRIVACY & OPERATIONAL TRUST
                 </div>
 
                 <div class="section-body">
+
                 Uploaded operational evidence is processed only for the active assessment session.
 
                 <br><br>
@@ -249,24 +433,40 @@ def run_ui():
 
                 <br><br>
 
+                Closing the browser or tab clears the active operational assessment session.
+
+                <br><br>
+
                 Please avoid uploading production credentials, personal employee data, or regulated customer information.
-                </div>
 
-                <div class="section-header">
-                HOW TO USE
-                </div>
-
-                <div class="section-body">
-                1. Fill in operational context fields<br>
-                2. Upload operational evidence<br>
-                3. Run assessment<br>
-                4. Review operational fragility themes and exposure indicators
                 </div>
                 """,
                 unsafe_allow_html=True
             )
 
-            st.markdown("<br>")
+            # ---------------------------------------------------
+            # HOW TO USE
+            # ---------------------------------------------------
+
+            st.markdown(
+                """
+                <div class="section-header">
+                HOW TO USE
+                </div>
+
+                <div class="section-body">
+
+                1. Fill in operational context fields<br>
+                2. Upload operational evidence<br>
+                3. Run assessment<br>
+                4. Review operational fragility themes and exposure indicators
+
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+            st.markdown("<br>", unsafe_allow_html=True)
 
             if st.button("Enter Platform", key="enter_platform"):
 
@@ -287,7 +487,9 @@ def run_ui():
     st.markdown(
         """
         <div class="scroll-cue">
-        ↓ Scroll down to upload operational evidence and begin analysis. No uploaded information is retained. Closing the browser or tab clears the active assessment session. ↓
+
+        ↓ Upload operational evidence to surface hidden transformation fragility, dependency exposure, and operational risk signals. No uploaded information is retained. Closing the browser or tab clears the active assessment session. ↓
+
         </div>
         """,
         unsafe_allow_html=True
@@ -385,7 +587,7 @@ def run_ui():
     )
 
     # ---------------------------------------------------
-    # ANALYSIS EXECUTION
+    # EXECUTE ANALYSIS
     # ---------------------------------------------------
 
     if run_analysis:
@@ -412,9 +614,17 @@ def run_ui():
 
             validated_signals = validate_signals(normalized_packets)
 
-            exposure_results = calculate_exposure_score(validated_signals)
+            exposure_results = calculate_exposure_score(
+                validated_signals
+            )
 
-            exposure_summary = generate_exposure_summary(exposure_results)
+            exposure_summary = generate_exposure_summary(
+                exposure_results
+            )
+
+        # ---------------------------------------------------
+        # RESULTS
+        # ---------------------------------------------------
 
         st.success(
             "Operational evidence analyzed successfully."
@@ -447,7 +657,8 @@ def run_ui():
 
         st.error(
             f"""
-Exposure Level: {exposure_results.get('exposure_level', 'UNKNOWN')}
+Exposure Level:
+{exposure_results.get('exposure_level', 'UNKNOWN')}
 
 Operational Exposure Score:
 {exposure_results.get('exposure_score', 0)} / 150
