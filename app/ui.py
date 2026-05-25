@@ -8,18 +8,17 @@ from validators.signal_validator import validate_signals
 
 
 # ---------------------------------------------------
-# SESSION STATE
-# ---------------------------------------------------
-
-if "show_guidance" not in st.session_state:
-    st.session_state.show_guidance = True
-
-
-# ---------------------------------------------------
 # MAIN UI
 # ---------------------------------------------------
 
 def run_ui():
+
+    # ---------------------------------------------------
+    # SESSION STATE
+    # ---------------------------------------------------
+
+    if "show_guidance" not in st.session_state:
+        st.session_state.show_guidance = True
 
     # ---------------------------------------------------
     # PAGE STYLE
@@ -366,9 +365,9 @@ def run_ui():
 
                 saved_files.append(saved_file)
 
-            normalized_evidence = normalize_evidence(saved_files)
+            normalized_packets = normalize_evidence(saved_files)
 
-            validated_signals = validate_signals(normalized_evidence)
+            validated_signals = validate_signals(normalized_packets)
 
             exposure_results = calculate_exposure_score(validated_signals)
 
@@ -379,10 +378,6 @@ def run_ui():
         )
 
         st.markdown("---")
-
-        # ---------------------------------------------------
-        # FRAGILITY THEMES
-        # ---------------------------------------------------
 
         st.header("Primary Operational Fragility Themes")
 
@@ -405,10 +400,6 @@ def run_ui():
 
         st.markdown("---")
 
-        # ---------------------------------------------------
-        # EXPOSURE ASSESSMENT
-        # ---------------------------------------------------
-
         st.header("Operational Exposure Assessment")
 
         st.error(
@@ -429,10 +420,6 @@ Operational Exposure Score:
 
         st.markdown("---")
 
-        # ---------------------------------------------------
-        # OPERATIONAL INTERPRETATION
-        # ---------------------------------------------------
-
         st.header("Operational Interpretation")
 
         st.write(
@@ -443,10 +430,6 @@ Operational Exposure Score:
         )
 
         st.markdown("---")
-
-        # ---------------------------------------------------
-        # FREE TIER UPSELL
-        # ---------------------------------------------------
 
         st.info(
             """
