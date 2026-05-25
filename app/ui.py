@@ -287,7 +287,7 @@ def run_ui():
     st.markdown(
         """
         <div class="scroll-cue">
-        ↓ Scroll down to continue setup and start the operational assessment ↓
+        ↓ Scroll down to upload operational evidence and begin analysis. No uploaded information is retained. Closing the browser or tab clears the active assessment session. ↓
         </div>
         """,
         unsafe_allow_html=True
