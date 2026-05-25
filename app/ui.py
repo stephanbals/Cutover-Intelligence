@@ -45,47 +45,27 @@ def run_ui():
             margin-bottom: 2rem;
         }
 
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.82);
-            z-index: 998;
-        }
-
-        .modal-content {
-
-            position: fixed;
-            top: 5%;
-            left: 50%;
-            transform: translateX(-50%);
-
-            width: 78%;
-            max-height: 88vh;
-
-            overflow-y: auto;
+        .onboarding-card {
 
             background: #0f172a;
-
             border: 1px solid #334155;
             border-radius: 18px;
 
             padding: 2rem;
 
-            z-index: 999;
+            box-shadow: 0px 0px 45px rgba(0,0,0,0.45);
 
-            box-shadow: 0px 0px 45px rgba(0,0,0,0.55);
+            margin-bottom: 2rem;
         }
 
-        .modal-title {
+        .card-title {
             font-size: 2.2rem;
             font-weight: 700;
             color: white;
+            margin-bottom: 0.3rem;
         }
 
-        .modal-subtitle {
+        .card-subtitle {
             color: #94a3b8;
             margin-bottom: 1.5rem;
         }
@@ -127,49 +107,42 @@ def run_ui():
     )
 
     # ---------------------------------------------------
-    # ONBOARDING MODAL
+    # ONBOARDING CARD
     # ---------------------------------------------------
 
     if st.session_state.show_guidance:
 
-        st.markdown(
-            """
-            <div class="modal-overlay"></div>
-            """,
-            unsafe_allow_html=True
-        )
+        onboarding_container = st.container(border=False)
 
-        modal_container = st.container()
-
-        with modal_container:
+        with onboarding_container:
 
             st.markdown(
                 """
-                <div class="modal-content">
+                <div class="onboarding-card">
                 """,
                 unsafe_allow_html=True
             )
 
-            header_col1, header_col2 = st.columns([20, 1])
+            top_col1, top_col2 = st.columns([20, 1])
 
-            with header_col1:
+            with top_col1:
 
                 st.markdown(
                     """
-                    <div class="modal-title">
+                    <div class="card-title">
                     Cutover Intelligence
                     </div>
 
-                    <div class="modal-subtitle">
+                    <div class="card-subtitle">
                     Operational Exposure & Execution Coherence Intelligence
                     </div>
                     """,
                     unsafe_allow_html=True
                 )
 
-            with header_col2:
+            with top_col2:
 
-                if st.button("✕", key="close_modal"):
+                if st.button("✕", key="close_intro"):
 
                     st.session_state.show_guidance = False
                     st.rerun()
@@ -182,18 +155,6 @@ def run_ui():
 
                 <div class="section-body">
                 This platform analyzes operational evidence from complex transformations and cutovers to surface recurring operational fragility, dependency instability, rollback uncertainty, escalation patterns, readiness inconsistencies, and execution coherence risks across fragmented operational artifacts.
-                </div>
-
-                <div class="section-header">
-                WHY THIS EXISTS
-                </div>
-
-                <div class="section-body">
-                Large transformations often distribute operational reality across spreadsheets, RAID logs, meeting notes, escalation discussions, readiness trackers, governance layers, and inconsistent reporting structures.
-
-                <br><br>
-
-                The platform aggregates fragmented operational signals into a consolidated operational exposure assessment.
                 </div>
 
                 <div class="section-header">
