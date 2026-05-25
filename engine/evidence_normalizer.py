@@ -1,5 +1,6 @@
 from pathlib import Path
 
+
 # ---------------------------------------------------
 # DETECT SOURCE CATEGORY
 # ---------------------------------------------------
@@ -30,43 +31,70 @@ def detect_source_category(file_type):
 
         return "unknown"
 
+
 # ---------------------------------------------------
 # NORMALIZE TEXT
 # ---------------------------------------------------
 
 def normalize_text(raw_text):
 
+    if not raw_text:
+
+        return ""
+
     normalized = raw_text.strip()
 
     normalized = normalized.replace("\n\n", "\n")
 
+    normalized = normalized.replace("\r", "")
+
     return normalized
 
+
 # ---------------------------------------------------
-# BUILD NORMALIZED EVIDENCE PACKET
+# BUILD EVIDENCE PACKET
 # ---------------------------------------------------
 
-def build_evidence_packet(registry_entry, extracted_text):
+def build_evidence_packet(saved_file):
+
+    file_path = Path(saved_file["path"])
+
+    file_type = file_path.suffix.lower()
 
     packet = {
 
-        "evidence_id": registry_entry["evidence_id"],
+        "filename": saved_file["filename"],
 
-        "filename": registry_entry["filename"],
+        "path": saved_file["path"],
 
-        "file_type": registry_entry["file_type"],
-
-        "registered_at": registry_entry["registered_at"],
+        "file_type": file_type,
 
         "source_category": detect_source_category(
-            registry_entry["file_type"]
+            file_type
         ),
 
-        "raw_text": extracted_text,
+        "raw_text": "",
 
-        "normalized_text": normalize_text(extracted_text),
+        "normalized_text": "",
 
         "signal_candidates": []
     }
 
     return packet
+
+
+# ---------------------------------------------------
+# NORMALIZE EVIDENCE
+# ---------------------------------------------------
+
+def normalize_evidence(saved_files):
+
+    normalized_packets = []
+
+    for saved_file in saved_files:
+
+        packet = build_evidence_packet(saved_file)
+
+        normalized_packets.append(packet)
+
+    return normalized_packets
