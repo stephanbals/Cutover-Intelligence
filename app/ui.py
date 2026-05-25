@@ -1,21 +1,18 @@
 import streamlit as st
 
-from engine.state_manager import (
-    save_intake,
-    save_session_state,
-    load_intake
-)
-
-from ingestion.uploader import save_uploaded_file
-from ingestion.text_extractor import extract_text
-from ingestion.file_registry import register_file
-
-from engine.evidence_normalizer import build_evidence_packet
-from validators.signal_validator import validate_signals
-from engine.exposure_summary import generate_exposure_summary
+from ingestion.uploader import handle_uploaded_files
+from engine.evidence_normalizer import normalize_evidence
 from engine.exposure_scoring import calculate_exposure_score
-from engine.tier_config import TIER_CONFIG
-from engine.contradiction_analysis import detect_contradictions
+from engine.exposure_summary import generate_exposure_summary
+from validators.signal_validator import validate_signals
+
+
+# ---------------------------------------------------
+# SESSION STATE
+# ---------------------------------------------------
+
+if "show_guidance" not in st.session_state:
+    st.session_state.show_guidance = True
 
 
 # ---------------------------------------------------
@@ -25,23 +22,76 @@ from engine.contradiction_analysis import detect_contradictions
 def run_ui():
 
     # ---------------------------------------------------
-    # PAGE CONFIG
+    # PAGE STYLING
     # ---------------------------------------------------
 
-    st.set_page_config(
-        page_title="Cutover Intelligence",
-        layout="wide"
+    st.markdown(
+        """
+        <style>
+
+        .stApp {
+            background-color: #050816;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.82);
+            z-index: 999;
+        }
+
+        .modal-container {
+            position: fixed;
+            top: 4%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 78%;
+            max-height: 88vh;
+            overflow-y: auto;
+            background-color: #0f172a;
+            padding: 2rem;
+            border-radius: 16px;
+            border: 1px solid #334155;
+            z-index: 1000;
+            box-shadow: 0px 0px 40px rgba(0,0,0,0.55);
+        }
+
+        .modal-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.2rem;
+            color: white;
+        }
+
+        .modal-subtitle {
+            color: #94a3b8;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-header {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-top: 1.4rem;
+            margin-bottom: 0.5rem;
+            color: white;
+        }
+
+        .section-text {
+            color: #d1d5db;
+            line-height: 1.7;
+            font-size: 0.96rem;
+        }
+
+        </style>
+        """,
+        unsafe_allow_html=True
     )
 
     # ---------------------------------------------------
-    # SESSION STATE
-    # ---------------------------------------------------
-
-    if "show_guidance" not in st.session_state:
-        st.session_state.show_guidance = False
-
-    # ---------------------------------------------------
-    # PAGE TITLE
+    # PAGE HEADER
     # ---------------------------------------------------
 
     st.title("Operational Exposure Snapshot")
@@ -51,108 +101,168 @@ def run_ui():
     )
 
     # ---------------------------------------------------
+    # ONBOARDING MODAL
+    # ---------------------------------------------------
+
+    if st.session_state.show_guidance:
+
+        st.markdown(
+            """
+            <div class="modal-overlay"></div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        st.markdown(
+            """
+            <div class="modal-container">
+            """,
+            unsafe_allow_html=True
+        )
+
+        close_col1, close_col2 = st.columns([20, 1])
+
+        with close_col1:
+
+            st.markdown(
+                """
+                <div class="modal-title">
+                Cutover Intelligence
+                </div>
+
+                <div class="modal-subtitle">
+                Operational Exposure & Execution Coherence Intelligence
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+        with close_col2:
+
+            if st.button("✕", key="close_modal"):
+
+                st.session_state.show_guidance = False
+                st.rerun()
+
+        st.markdown(
+            """
+            <div class="section-header">
+            WHAT THIS PLATFORM DOES
+            </div>
+
+            <div class="section-text">
+            This platform analyzes operational evidence from complex transformations and cutovers to surface recurring operational fragility, dependency instability, rollback uncertainty, escalation patterns, readiness inconsistencies, and execution coherence risks across fragmented operational artifacts.
+            </div>
+
+            <div class="section-header">
+            WHY THIS EXISTS
+            </div>
+
+            <div class="section-text">
+            Large transformations often distribute operational reality across spreadsheets, RAID logs, meeting notes, escalation discussions, readiness trackers, governance layers, and inconsistent reporting structures.
+            <br><br>
+            The platform aggregates fragmented operational signals into a consolidated operational exposure assessment.
+            </div>
+
+            <div class="section-header">
+            SUPPORTED TRANSFORMATION SCENARIOS
+            </div>
+
+            <div class="section-text">
+            • SAP cutovers<br>
+            • ERP transformations<br>
+            • cloud migration cutovers<br>
+            • SaaS/platform migrations<br>
+            • infrastructure transitions<br>
+            • major operational release waves<br>
+            • multi-stream transformation programs
+            </div>
+
+            <div class="section-header">
+            RECOMMENDED OPERATIONAL EVIDENCE
+            </div>
+
+            <div class="section-text">
+            • RAID logs<br>
+            • dependency registers<br>
+            • risk registers<br>
+            • cutover plans<br>
+            • readiness reviews<br>
+            • escalation logs<br>
+            • meeting notes<br>
+            • operational spreadsheets<br>
+            • screenshots and exports<br>
+            • governance reporting extracts
+            </div>
+
+            <div class="section-header">
+            SUPPORTED FILE TYPES
+            </div>
+
+            <div class="section-text">
+            • XLSX / CSV<br>
+            • DOCX / PPTX / PDF / TXT<br>
+            • PNG / JPG / JPEG
+            </div>
+
+            <div class="section-header">
+            PRIVACY & OPERATIONAL TRUST
+            </div>
+
+            <div class="section-text">
+            Uploaded operational evidence is processed only for the active assessment session.
+            <br><br>
+            Operational data is not intentionally retained, sold, or used for external model training or secondary purposes.
+            <br><br>
+            Please avoid uploading production credentials, personal employee data, or regulated customer information.
+            </div>
+
+            <div class="section-header">
+            HOW TO USE
+            </div>
+
+            <div class="section-text">
+            1. Fill in operational context fields<br>
+            2. Upload operational evidence<br>
+            3. Run assessment<br>
+            4. Review operational fragility themes and exposure indicators
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        st.markdown("<br>", unsafe_allow_html=True)
+
+        if st.button("Enter Platform", key="enter_platform"):
+
+            st.session_state.show_guidance = False
+            st.rerun()
+
+        st.markdown(
+            """
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+    # ---------------------------------------------------
     # TIER SELECTION
     # ---------------------------------------------------
 
     selected_tier = st.selectbox(
         "Select Intelligence Tier",
         [
-            "FREE",
-            "TIER1",
-            "TIER2",
-            "TIER3"
+            "FREE"
         ]
     )
 
-    tier_settings = TIER_CONFIG[selected_tier]
-
-    # ---------------------------------------------------
-    # HEADER
-    # ---------------------------------------------------
-
-    col1, col2 = st.columns([6, 2])
-
-    with col1:
-        st.subheader(
-            "Step 1 — Operational Context"
-        )
-
-    with col2:
-
-        if st.button(
-            "What Operational Risks Can This Detect & How To Use"
-        ):
-            st.session_state.show_guidance = True
-
-    # ---------------------------------------------------
-    # GUIDANCE PANEL
-    # ---------------------------------------------------
-
-    if st.session_state.show_guidance:
-
-        with st.container():
-
-            header_col1, header_col2 = st.columns([20, 1])
-
-            with header_col1:
-
-                st.subheader(
-                    "Operational Exposure Intelligence"
-                )
-
-            with header_col2:
-
-                if st.button("✕"):
-
-                    st.session_state.show_guidance = False
-                    st.rerun()
-
-            st.info("""
-WHAT THIS PLATFORM DOES
-
-This platform analyzes operational evidence from complex transformations and cutovers to identify recurring operational fragility signals, dependency exposure, rollback concerns, escalation patterns, readiness inconsistencies, and survivability risks across fragmented operational artifacts.
-
-WHY THIS EXISTS
-
-Large transformations often distribute operational reality across spreadsheets, RAID logs, meeting notes, escalation discussions, readiness trackers, and inconsistent reporting structures.
-
-The platform aggregates these fragmented operational signals into a consolidated operational exposure view.
-
-WHAT THE FREE TIER PROVIDES
-
-The Free Tier provides deterministic evidence-first operational exposure analysis, including:
-
-- recurring fragility signal detection
-- operational exposure scoring
-- contradiction detection
-- repeated escalation pattern visibility
-- rollback and dependency concern aggregation
-
-RECOMMENDED OPERATIONAL EVIDENCE
-
-- RAID logs
-- dependency registers
-- risk registers
-- cutover plans
-- readiness reviews
-- escalation logs
-- meeting notes
-- operational spreadsheets
-- screenshots and exports
-
-SUPPORTED FILE TYPES
-
-- XLSX / CSV
-- DOCX / PPTX / PDF / TXT
-- PNG / JPG / JPEG
-- Email exports
-- Teams notes
-- SharePoint extracts
-            """)
+    st.markdown("---")
 
     # ---------------------------------------------------
     # OPERATIONAL CONTEXT
     # ---------------------------------------------------
+
+    st.header("Step 1 — Operational Context")
 
     project_name = st.text_input(
         "Project Name"
@@ -184,391 +294,135 @@ SUPPORTED FILE TYPES
     )
 
     observations = st.text_area(
-        "Any other Optional Operational Observations the user of the Platform would like to give at this moment in time?"
+        "Any Other Optional Operational Observations?"
     )
+
+    st.markdown("---")
 
     # ---------------------------------------------------
-    # EVIDENCE UPLOADS
+    # FILE UPLOAD
     # ---------------------------------------------------
 
-    st.subheader(
-        "Step 2 — Operational Evidence Upload"
-    )
+    st.header("Step 2 — Upload Operational Evidence")
 
-    risk_files = st.file_uploader(
-        "Upload Risk Files",
-        accept_multiple_files=True,
-        type=[
-            "txt",
-            "csv",
-            "docx",
-            "pdf",
-            "xlsx",
-            "pptx"
-        ],
-        key="risk_files"
-    )
-
-    dependency_files = st.file_uploader(
-        "Upload Dependency Files",
-        accept_multiple_files=True,
-        type=[
-            "txt",
-            "csv",
-            "docx",
-            "pdf",
-            "xlsx",
-            "pptx"
-        ],
-        key="dependency_files"
+    st.warning(
+        "Please avoid uploading production credentials, personal employee data, or regulated customer information."
     )
 
     uploaded_files = st.file_uploader(
-        "Upload Additional Operational Evidence",
-        accept_multiple_files=True,
+        "Upload Operational Evidence",
         type=[
-            "txt",
+            "xlsx",
             "csv",
             "docx",
-            "pdf",
-            "xlsx",
             "pptx",
+            "pdf",
+            "txt",
             "png",
             "jpg",
             "jpeg"
         ],
-        key="general_files"
+        accept_multiple_files=True
+    )
+
+    st.markdown("---")
+
+    # ---------------------------------------------------
+    # ANALYSIS BUTTON
+    # ---------------------------------------------------
+
+    run_analysis = st.button(
+        "Run Operational Exposure Assessment",
+        type="primary"
     )
 
     # ---------------------------------------------------
-    # ANALYZE BUTTON
+    # RUN ANALYSIS
     # ---------------------------------------------------
 
-    if st.button("Analyze Operational Exposure"):
+    if run_analysis:
 
-        intake_data = {
-            "project_name": project_name,
-            "systems": systems,
-            "timeline": timeline,
-            "deployment_type": deployment_type,
-            "observations": observations,
-            "selected_tier": selected_tier,
-            "any other affected programs/changes/releases": affected_programs,
-        }
+        if not uploaded_files:
 
-        # ---------------------------------------------------
-        # SAVE STATE
-        # ---------------------------------------------------
+            st.error(
+                "Please upload at least one operational evidence file."
+            )
 
-        save_intake(intake_data)
+            return
 
-        save_session_state()
+        with st.spinner("Analyzing operational evidence..."):
 
-        # ---------------------------------------------------
-        # PROCESS EVIDENCE
-        # ---------------------------------------------------
+            extracted_text = handle_uploaded_files(uploaded_files)
 
-        uploaded_file_data = []
+            normalized_evidence = normalize_evidence(extracted_text)
 
-        all_uploaded_files = []
+            validated_signals = validate_signals(normalized_evidence)
 
-        if risk_files:
-            all_uploaded_files.extend(risk_files)
+            exposure_results = calculate_exposure_score(validated_signals)
 
-        if dependency_files:
-            all_uploaded_files.extend(dependency_files)
-
-        if uploaded_files:
-            all_uploaded_files.extend(uploaded_files)
-
-        if all_uploaded_files:
-
-            with st.spinner(
-                "Analyzing operational evidence..."
-            ):
-
-                for uploaded_file in all_uploaded_files:
-
-                    # ---------------------------------------
-                    # SAVE FILE
-                    # ---------------------------------------
-
-                    file_data = save_uploaded_file(
-                        uploaded_file
-                    )
-
-                    # ---------------------------------------
-                    # REGISTER FILE
-                    # ---------------------------------------
-
-                    registry_entry = register_file(
-                        file_data
-                    )
-
-                    # ---------------------------------------
-                    # EXTRACT TEXT
-                    # ---------------------------------------
-
-                    extracted_text = extract_text(
-                        file_data["path"]
-                    )
-
-                    # ---------------------------------------
-                    # BUILD EVIDENCE PACKET
-                    # ---------------------------------------
-
-                    evidence_packet = build_evidence_packet(
-                        registry_entry,
-                        extracted_text
-                    )
-
-                    evidence_packet[
-                        "extracted_preview"
-                    ] = extracted_text[:1000]
-
-                    # ---------------------------------------
-                    # VALIDATE SIGNALS
-                    # ---------------------------------------
-
-                    detected_signals = validate_signals(
-                        evidence_packet
-                    )
-
-                    evidence_packet[
-                        "signal_candidates"
-                    ] = detected_signals
-
-                    uploaded_file_data.append(
-                        evidence_packet
-                    )
-
-        # ---------------------------------------------------
-        # SUCCESS
-        # ---------------------------------------------------
+            exposure_summary = generate_exposure_summary(exposure_results)
 
         st.success(
             "Operational evidence analyzed successfully."
         )
 
-        # ---------------------------------------------------
-        # OPERATIONAL CONTEXT DISPLAY
-        # ---------------------------------------------------
+        st.markdown("---")
 
-        st.subheader(
-            "Operational Context"
+        st.header("Primary Operational Fragility Themes")
+
+        fragility_themes = exposure_results.get(
+            "fragility_themes",
+            []
         )
 
-        loaded_intake = load_intake()
+        if fragility_themes:
 
-        st.markdown(f"""
-### Project Overview
+            for theme in fragility_themes:
 
-**Project Name**  
-{loaded_intake.get("project_name", "")}
+                st.warning(theme)
 
-**Deployment Type**  
-{loaded_intake.get("deployment_type", "")}
+        else:
 
-**Timeline / Deployment Window**  
-{loaded_intake.get("timeline", "")}
-
----
-
-### Systems Involved
-
-{loaded_intake.get("systems", "")}
-
----
-
-### Affected Programs / Releases
-
-{loaded_intake.get("any other affected programs/changes/releases", "")}
-
----
-
-### Operational Observations
-
-{loaded_intake.get("observations", "")}
-        """)
-
-        # ---------------------------------------------------
-        # DISPLAY EVIDENCE
-        # ---------------------------------------------------
-
-        if uploaded_file_data:
-
-            with st.expander(
-                "View Processed Operational Evidence"
-            ):
-
-                st.json(uploaded_file_data)
-
-            # ---------------------------------------------------
-            # EXPOSURE SUMMARY
-            # ---------------------------------------------------
-
-            if tier_settings["exposure_summary"]:
-
-                exposure_summary = generate_exposure_summary(
-                    uploaded_file_data
-                )
-
-                st.subheader(
-                    "Primary Operational Fragility Themes"
-                )
-
-                fragility_map = {
-                    "unclear": "Rollback and operational ownership uncertainty",
-                    "rollback": "Rollback survivability uncertainty",
-                    "dependency": "Dependency ambiguity and sequencing instability",
-                    "incomplete": "Incomplete readiness validation",
-                    "pending": "Pending operational approvals and unresolved actions",
-                    "escalation": "Escalation instability and coordination pressure",
-                    "concern": "Operational concern concentration across evidence sources",
-                    "partially": "Partial readiness and fragmented validation coverage"
-                }
-
-                displayed_fragilities = set()
-
-                for item in exposure_summary:
-
-                    cleaned_item = (
-                        item
-                        .replace(
-                            "Repeated operational concern detected around",
-                            ""
-                        )
-                        .replace(
-                            "Operational concern related to",
-                            ""
-                        )
-                        .replace(
-                            "detected in more than one evidence source.",
-                            ""
-                        )
-                        .replace(
-                            "across multiple evidence sources.",
-                            ""
-                        )
-                        .replace(
-                            "'",
-                            ""
-                        )
-                        .strip()
-                        .lower()
-                    )
-
-                    if cleaned_item in fragility_map:
-
-                        readable_fragility = fragility_map[
-                            cleaned_item
-                        ]
-
-                        if readable_fragility not in displayed_fragilities:
-
-                            st.warning(
-                                readable_fragility
-                            )
-
-                            displayed_fragilities.add(
-                                readable_fragility
-                            )
-
-            # ---------------------------------------------------
-            # EXPOSURE SCORE
-            # ---------------------------------------------------
-
-            if tier_settings["exposure_scoring"]:
-
-                exposure_score = calculate_exposure_score(
-                    uploaded_file_data
-                )
-
-                st.subheader(
-                    "Operational Exposure Assessment"
-                )
-
-                st.error(
-                    f"""
-Exposure Level: {exposure_score['exposure_level']}
-
-Operational Exposure Score: {exposure_score['total_score']} / 150
-"""
-                )
-
-                score = exposure_score[
-                    "total_score"
-                ]
-
-                if score <= 20:
-                    interpretation = "Minimal Operational Exposure"
-
-                elif score <= 40:
-                    interpretation = "Moderate Operational Exposure"
-
-                elif score <= 60:
-                    interpretation = "Elevated Operational Exposure"
-
-                elif score <= 80:
-                    interpretation = "High Operational Exposure"
-
-                else:
-                    interpretation = "Severe Operational Exposure"
-
-                st.info(
-                    f"""
-Exposure Interpretation
-
-{interpretation}
-
-This assessment identified recurring operational fragility indicators across multiple operational evidence sources.
-"""
-                )
-
-            # ---------------------------------------------------
-            # OPERATIONAL INTERPRETATION
-            # ---------------------------------------------------
-
-            st.subheader(
-                "Operational Interpretation"
+            st.success(
+                "No major recurring fragility themes detected."
             )
 
-            st.write("""
-The uploaded operational evidence suggests recurring operational uncertainty patterns across rollback planning, dependency coordination, readiness validation, and escalation management.
+        st.markdown("---")
 
-Several evidence sources contain indicators of execution instability, unresolved operational ambiguity, and coordination fragility that may require additional operational review.
-            """)
+        st.header("Operational Exposure Assessment")
 
-            # ---------------------------------------------------
-            # CONTRADICTIONS
-            # ---------------------------------------------------
+        st.error(
+            f"""
+Exposure Level: {exposure_results.get('exposure_level', 'UNKNOWN')}
 
-            if tier_settings["contradiction_analysis"]:
+Operational Exposure Score:
+{exposure_results.get('exposure_score', 0)} / 150
+"""
+        )
 
-                contradictions = detect_contradictions(
-                    uploaded_file_data
-                )
+        st.info(
+            exposure_summary.get(
+                "exposure_interpretation",
+                "No exposure interpretation available."
+            )
+        )
 
-                if contradictions:
+        st.markdown("---")
 
-                    st.subheader(
-                        "Operational Contradictions"
-                    )
+        st.header("Operational Interpretation")
 
-                    for contradiction in contradictions:
+        st.write(
+            exposure_summary.get(
+                "operational_interpretation",
+                "No operational interpretation available."
+            )
+        )
 
-                        st.info(
-                            contradiction
-                        )
+        st.markdown("---")
 
-            # ---------------------------------------------------
-            # COMMERCIAL FOOTER
-            # ---------------------------------------------------
-
-            st.markdown("---")
-
-            st.caption("""
-This assessment was generated using the Free Operational Exposure Intelligence demonstration tier.
+        st.info(
+            """
+This assessment was generated using the Free Operational Exposure tier.
 
 Advanced intelligence tiers provide:
 
@@ -578,8 +432,6 @@ Advanced intelligence tiers provide:
 - governance and execution intelligence
 - executive operational review outputs
 
-Advanced packs available from €49 excl. VAT.
-
-Contact:
-Stephan.Bals@SB3PMAdvisory.com
-            """)
+Advanced operational review packs available from €49 excl. VAT.
+"""
+        )
