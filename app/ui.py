@@ -18,10 +18,11 @@ def run_ui():
     # ---------------------------------------------------
 
     if "show_guidance" not in st.session_state:
+
         st.session_state.show_guidance = True
 
     # ---------------------------------------------------
-    # PAGE STYLE
+    # GLOBAL STYLE
     # ---------------------------------------------------
 
     st.markdown(
@@ -32,6 +33,18 @@ def run_ui():
             background-color: #050816;
         }
 
+        .main-title {
+            font-size: 4rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+
+        .main-subtitle {
+            color: #94a3b8;
+            margin-bottom: 2rem;
+        }
+
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -39,30 +52,37 @@ def run_ui():
             width: 100%;
             height: 100%;
             background: rgba(0,0,0,0.82);
-            z-index: 999;
+            z-index: 998;
         }
 
-        .modal-box {
+        .modal-content {
+
             position: fixed;
-            top: 4%;
+            top: 5%;
             left: 50%;
             transform: translateX(-50%);
+
             width: 78%;
             max-height: 88vh;
+
             overflow-y: auto;
+
             background: #0f172a;
+
             border: 1px solid #334155;
-            border-radius: 16px;
+            border-radius: 18px;
+
             padding: 2rem;
-            z-index: 1000;
+
+            z-index: 999;
+
             box-shadow: 0px 0px 45px rgba(0,0,0,0.55);
         }
 
         .modal-title {
-            font-size: 2.1rem;
+            font-size: 2.2rem;
             font-weight: 700;
             color: white;
-            margin-bottom: 0.2rem;
         }
 
         .modal-subtitle {
@@ -71,16 +91,16 @@ def run_ui():
         }
 
         .section-header {
+            color: white;
             font-size: 1.05rem;
             font-weight: 700;
-            color: white;
             margin-top: 1.3rem;
-            margin-bottom: 0.4rem;
+            margin-bottom: 0.5rem;
         }
 
-        .section-text {
+        .section-body {
             color: #d1d5db;
-            line-height: 1.65;
+            line-height: 1.7;
             font-size: 0.95rem;
         }
 
@@ -93,10 +113,17 @@ def run_ui():
     # PAGE HEADER
     # ---------------------------------------------------
 
-    st.title("Operational Exposure Snapshot")
+    st.markdown(
+        """
+        <div class="main-title">
+        Operational Exposure Snapshot
+        </div>
 
-    st.caption(
-        "Evidence-first operational intelligence for complex transformations and cutovers."
+        <div class="main-subtitle">
+        Evidence-first operational intelligence for complex transformations and cutovers.
+        </div>
+        """,
+        unsafe_allow_html=True
     )
 
     # ---------------------------------------------------
@@ -112,143 +139,147 @@ def run_ui():
             unsafe_allow_html=True
         )
 
-        st.markdown(
-            """
-            <div class="modal-box">
-            """,
-            unsafe_allow_html=True
-        )
+        modal_container = st.container()
 
-        top_col1, top_col2 = st.columns([20, 1])
-
-        with top_col1:
+        with modal_container:
 
             st.markdown(
                 """
-                <div class="modal-title">
-                Cutover Intelligence
+                <div class="modal-content">
+                """,
+                unsafe_allow_html=True
+            )
+
+            header_col1, header_col2 = st.columns([20, 1])
+
+            with header_col1:
+
+                st.markdown(
+                    """
+                    <div class="modal-title">
+                    Cutover Intelligence
+                    </div>
+
+                    <div class="modal-subtitle">
+                    Operational Exposure & Execution Coherence Intelligence
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
+
+            with header_col2:
+
+                if st.button("✕", key="close_modal"):
+
+                    st.session_state.show_guidance = False
+                    st.rerun()
+
+            st.markdown(
+                """
+                <div class="section-header">
+                WHAT THIS PLATFORM DOES
                 </div>
 
-                <div class="modal-subtitle">
-                Operational Exposure & Execution Coherence Intelligence
+                <div class="section-body">
+                This platform analyzes operational evidence from complex transformations and cutovers to surface recurring operational fragility, dependency instability, rollback uncertainty, escalation patterns, readiness inconsistencies, and execution coherence risks across fragmented operational artifacts.
+                </div>
+
+                <div class="section-header">
+                WHY THIS EXISTS
+                </div>
+
+                <div class="section-body">
+                Large transformations often distribute operational reality across spreadsheets, RAID logs, meeting notes, escalation discussions, readiness trackers, governance layers, and inconsistent reporting structures.
+
+                <br><br>
+
+                The platform aggregates fragmented operational signals into a consolidated operational exposure assessment.
+                </div>
+
+                <div class="section-header">
+                SUPPORTED TRANSFORMATION SCENARIOS
+                </div>
+
+                <div class="section-body">
+                • SAP cutovers<br>
+                • ERP transformations<br>
+                • cloud migration cutovers<br>
+                • SaaS/platform migrations<br>
+                • infrastructure transitions<br>
+                • major operational release waves<br>
+                • multi-stream transformation programs
+                </div>
+
+                <div class="section-header">
+                RECOMMENDED OPERATIONAL EVIDENCE
+                </div>
+
+                <div class="section-body">
+                • RAID logs<br>
+                • dependency registers<br>
+                • risk registers<br>
+                • cutover plans<br>
+                • readiness reviews<br>
+                • escalation logs<br>
+                • meeting notes<br>
+                • operational spreadsheets<br>
+                • screenshots and exports<br>
+                • governance reporting extracts
+                </div>
+
+                <div class="section-header">
+                SUPPORTED FILE TYPES
+                </div>
+
+                <div class="section-body">
+                • XLSX / CSV<br>
+                • DOCX / PPTX / PDF / TXT<br>
+                • PNG / JPG / JPEG
+                </div>
+
+                <div class="section-header">
+                PRIVACY & OPERATIONAL TRUST
+                </div>
+
+                <div class="section-body">
+                Uploaded operational evidence is processed only for the active assessment session.
+
+                <br><br>
+
+                Operational data is not intentionally retained, sold, or used for external model training or secondary purposes.
+
+                <br><br>
+
+                Please avoid uploading production credentials, personal employee data, or regulated customer information.
+                </div>
+
+                <div class="section-header">
+                HOW TO USE
+                </div>
+
+                <div class="section-body">
+                1. Fill in operational context fields<br>
+                2. Upload operational evidence<br>
+                3. Run assessment<br>
+                4. Review operational fragility themes and exposure indicators
                 </div>
                 """,
                 unsafe_allow_html=True
             )
 
-        with top_col2:
+            st.markdown("<br>")
 
-            if st.button("✕", key="close_modal"):
+            if st.button("Enter Platform", key="enter_platform"):
 
                 st.session_state.show_guidance = False
                 st.rerun()
 
-        st.markdown(
-            """
-            <div class="section-header">
-            WHAT THIS PLATFORM DOES
-            </div>
-
-            <div class="section-text">
-            This platform analyzes operational evidence from complex transformations and cutovers to surface recurring operational fragility, dependency instability, rollback uncertainty, escalation patterns, readiness inconsistencies, and execution coherence risks across fragmented operational artifacts.
-            </div>
-
-            <div class="section-header">
-            WHY THIS EXISTS
-            </div>
-
-            <div class="section-text">
-            Large transformations often distribute operational reality across spreadsheets, RAID logs, meeting notes, escalation discussions, readiness trackers, governance layers, and inconsistent reporting structures.
-
-            <br><br>
-
-            The platform aggregates fragmented operational signals into a consolidated operational exposure assessment.
-            </div>
-
-            <div class="section-header">
-            SUPPORTED TRANSFORMATION SCENARIOS
-            </div>
-
-            <div class="section-text">
-            • SAP cutovers<br>
-            • ERP transformations<br>
-            • cloud migration cutovers<br>
-            • SaaS/platform migrations<br>
-            • infrastructure transitions<br>
-            • major operational release waves<br>
-            • multi-stream transformation programs
-            </div>
-
-            <div class="section-header">
-            RECOMMENDED OPERATIONAL EVIDENCE
-            </div>
-
-            <div class="section-text">
-            • RAID logs<br>
-            • dependency registers<br>
-            • risk registers<br>
-            • cutover plans<br>
-            • readiness reviews<br>
-            • escalation logs<br>
-            • meeting notes<br>
-            • operational spreadsheets<br>
-            • screenshots and exports<br>
-            • governance reporting extracts
-            </div>
-
-            <div class="section-header">
-            SUPPORTED FILE TYPES
-            </div>
-
-            <div class="section-text">
-            • XLSX / CSV<br>
-            • DOCX / PPTX / PDF / TXT<br>
-            • PNG / JPG / JPEG
-            </div>
-
-            <div class="section-header">
-            PRIVACY & OPERATIONAL TRUST
-            </div>
-
-            <div class="section-text">
-            Uploaded operational evidence is processed only for the active assessment session.
-
-            <br><br>
-
-            Operational data is not intentionally retained, sold, or used for external model training or secondary purposes.
-
-            <br><br>
-
-            Please avoid uploading production credentials, personal employee data, or regulated customer information.
-            </div>
-
-            <div class="section-header">
-            HOW TO USE
-            </div>
-
-            <div class="section-text">
-            1. Fill in operational context fields<br>
-            2. Upload operational evidence<br>
-            3. Run assessment<br>
-            4. Review operational fragility themes and exposure indicators
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
-        st.markdown("<br>", unsafe_allow_html=True)
-
-        if st.button("Enter Platform", key="enter_platform"):
-
-            st.session_state.show_guidance = False
-            st.rerun()
-
-        st.markdown(
-            """
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+            st.markdown(
+                """
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
 
     # ---------------------------------------------------
     # TIER SELECTION
