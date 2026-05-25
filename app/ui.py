@@ -162,19 +162,17 @@ def run_ui():
     # ---------------------------------------------------
 
     st.markdown(
-        """
+    """
         <div class="main-title">
-        Detect Transformation Fragility Before Go-Live Failure
+            Detect Transformation Fragility Before Go-Live Failure
         </div>
 
         <div class="main-subtitle">
-
-        Surface hidden operational, governance, and execution risks before they escalate into delays, rollback events, outages, or transformation failure.
-
+            Earlier visibility into operational fragility can help reduce costly deployment failures, escalation cycles, and stabilization efforts.
         </div>
-        """,
+            """,
         unsafe_allow_html=True
-    )
+)
 
     # ---------------------------------------------------
     # ONBOARDING / INTRODUCTION
@@ -240,11 +238,9 @@ def run_ui():
 
                 Large transformations often fail because critical operational signals remain fragmented across spreadsheets, RAID logs, readiness reporting, escalation chains, governance layers, and operational discussions.
 
-                <br><br>
-
+                <br>
                 By the time leadership sees the full picture:
-
-                <br><br>
+                <br>
 
                 • rollback windows are shrinking<br>
                 • dependencies are already unstable<br>
@@ -252,7 +248,7 @@ def run_ui():
                 • escalation paths become overloaded<br>
                 • operational exposure has already materially increased
 
-                <br><br>
+                <br>
 
                 Cutover Intelligence consolidates fragmented operational evidence into a single operational exposure assessment before failures escalate into outages, delays, governance breakdown, or transformation paralysis.
 
