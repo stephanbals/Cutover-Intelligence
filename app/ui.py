@@ -1,6 +1,6 @@
 import streamlit as st
 
-from ingestion.uploader import handle_uploaded_files
+from ingestion.uploader import save_uploaded_file
 from engine.evidence_normalizer import normalize_evidence
 from engine.exposure_scoring import calculate_exposure_score
 from engine.exposure_summary import generate_exposure_summary
@@ -22,7 +22,7 @@ if "show_guidance" not in st.session_state:
 def run_ui():
 
     # ---------------------------------------------------
-    # PAGE STYLING
+    # PAGE STYLE
     # ---------------------------------------------------
 
     st.markdown(
@@ -39,11 +39,11 @@ def run_ui():
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.82);
+            background: rgba(0,0,0,0.82);
             z-index: 999;
         }
 
-        .modal-container {
+        .modal-box {
             position: fixed;
             top: 4%;
             left: 50%;
@@ -51,19 +51,19 @@ def run_ui():
             width: 78%;
             max-height: 88vh;
             overflow-y: auto;
-            background-color: #0f172a;
-            padding: 2rem;
-            border-radius: 16px;
+            background: #0f172a;
             border: 1px solid #334155;
+            border-radius: 16px;
+            padding: 2rem;
             z-index: 1000;
-            box-shadow: 0px 0px 40px rgba(0,0,0,0.55);
+            box-shadow: 0px 0px 45px rgba(0,0,0,0.55);
         }
 
         .modal-title {
-            font-size: 2.2rem;
+            font-size: 2.1rem;
             font-weight: 700;
-            margin-bottom: 0.2rem;
             color: white;
+            margin-bottom: 0.2rem;
         }
 
         .modal-subtitle {
@@ -72,17 +72,17 @@ def run_ui():
         }
 
         .section-header {
-            font-size: 1.15rem;
+            font-size: 1.05rem;
             font-weight: 700;
-            margin-top: 1.4rem;
-            margin-bottom: 0.5rem;
             color: white;
+            margin-top: 1.3rem;
+            margin-bottom: 0.4rem;
         }
 
         .section-text {
             color: #d1d5db;
-            line-height: 1.7;
-            font-size: 0.96rem;
+            line-height: 1.65;
+            font-size: 0.95rem;
         }
 
         </style>
@@ -115,14 +115,14 @@ def run_ui():
 
         st.markdown(
             """
-            <div class="modal-container">
+            <div class="modal-box">
             """,
             unsafe_allow_html=True
         )
 
-        close_col1, close_col2 = st.columns([20, 1])
+        top_col1, top_col2 = st.columns([20, 1])
 
-        with close_col1:
+        with top_col1:
 
             st.markdown(
                 """
@@ -137,7 +137,7 @@ def run_ui():
                 unsafe_allow_html=True
             )
 
-        with close_col2:
+        with top_col2:
 
             if st.button("✕", key="close_modal"):
 
@@ -160,7 +160,9 @@ def run_ui():
 
             <div class="section-text">
             Large transformations often distribute operational reality across spreadsheets, RAID logs, meeting notes, escalation discussions, readiness trackers, governance layers, and inconsistent reporting structures.
+
             <br><br>
+
             The platform aggregates fragmented operational signals into a consolidated operational exposure assessment.
             </div>
 
@@ -211,9 +213,13 @@ def run_ui():
 
             <div class="section-text">
             Uploaded operational evidence is processed only for the active assessment session.
+
             <br><br>
+
             Operational data is not intentionally retained, sold, or used for external model training or secondary purposes.
+
             <br><br>
+
             Please avoid uploading production credentials, personal employee data, or regulated customer information.
             </div>
 
@@ -328,7 +334,7 @@ def run_ui():
     st.markdown("---")
 
     # ---------------------------------------------------
-    # ANALYSIS BUTTON
+    # RUN ANALYSIS
     # ---------------------------------------------------
 
     run_analysis = st.button(
@@ -337,7 +343,7 @@ def run_ui():
     )
 
     # ---------------------------------------------------
-    # RUN ANALYSIS
+    # ANALYSIS EXECUTION
     # ---------------------------------------------------
 
     if run_analysis:
@@ -352,9 +358,15 @@ def run_ui():
 
         with st.spinner("Analyzing operational evidence..."):
 
-            extracted_text = handle_uploaded_files(uploaded_files)
+            saved_files = []
 
-            normalized_evidence = normalize_evidence(extracted_text)
+            for uploaded_file in uploaded_files:
+
+                saved_file = save_uploaded_file(uploaded_file)
+
+                saved_files.append(saved_file)
+
+            normalized_evidence = normalize_evidence(saved_files)
 
             validated_signals = validate_signals(normalized_evidence)
 
@@ -367,6 +379,10 @@ def run_ui():
         )
 
         st.markdown("---")
+
+        # ---------------------------------------------------
+        # FRAGILITY THEMES
+        # ---------------------------------------------------
 
         st.header("Primary Operational Fragility Themes")
 
@@ -389,6 +405,10 @@ def run_ui():
 
         st.markdown("---")
 
+        # ---------------------------------------------------
+        # EXPOSURE ASSESSMENT
+        # ---------------------------------------------------
+
         st.header("Operational Exposure Assessment")
 
         st.error(
@@ -409,6 +429,10 @@ Operational Exposure Score:
 
         st.markdown("---")
 
+        # ---------------------------------------------------
+        # OPERATIONAL INTERPRETATION
+        # ---------------------------------------------------
+
         st.header("Operational Interpretation")
 
         st.write(
@@ -419,6 +443,10 @@ Operational Exposure Score:
         )
 
         st.markdown("---")
+
+        # ---------------------------------------------------
+        # FREE TIER UPSELL
+        # ---------------------------------------------------
 
         st.info(
             """
