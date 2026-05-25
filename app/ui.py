@@ -70,6 +70,20 @@ def run_ui():
             margin-bottom: 1.5rem;
         }
 
+        .guidance-banner {
+            background: rgba(59,130,246,0.12);
+            border: 1px solid rgba(59,130,246,0.35);
+            color: #dbeafe;
+
+            padding: 1rem;
+            border-radius: 12px;
+
+            font-size: 1rem;
+            font-weight: 600;
+
+            margin-bottom: 1.5rem;
+        }
+
         .section-header {
             color: white;
             font-size: 1.05rem;
@@ -134,6 +148,15 @@ def run_ui():
             st.markdown(
                 """
                 <div class="onboarding-card">
+                """,
+                unsafe_allow_html=True
+            )
+
+            st.markdown(
+                """
+                <div class="guidance-banner">
+                👇 Read this quick introduction, then click the ✕ in the top-right corner to start using the platform.
+                </div>
                 """,
                 unsafe_allow_html=True
             )
