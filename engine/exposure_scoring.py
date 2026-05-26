@@ -9,6 +9,7 @@ SEVERITY_WEIGHTS = {
     "low": 1
 }
 
+
 # ---------------------------------------------------
 # LEGACY SIGNAL SEVERITY MAP
 # ---------------------------------------------------
@@ -33,6 +34,7 @@ LEGACY_SIGNAL_SEVERITY = {
     "uncertain": "low"
 }
 
+
 # ---------------------------------------------------
 # CALCULATE EXPOSURE SCORE
 # ---------------------------------------------------
@@ -47,15 +49,23 @@ def calculate_exposure_score(evidence_packets):
 
     for packet in evidence_packets:
 
-        for signal in packet["signal_candidates"]:
+        signal_candidates = packet.get(
+            "signal_candidates",
+            []
+        )
+
+        for signal in signal_candidates:
 
             # -------------------------------------------
-            # NEW STRUCTURED SIGNALS
+            # STRUCTURED SIGNAL OBJECTS
             # -------------------------------------------
 
             if isinstance(signal, dict):
 
-                severity = signal["severity"]
+                severity = signal.get(
+                    "severity",
+                    "low"
+                )
 
             # -------------------------------------------
             # LEGACY STRING SIGNALS
@@ -89,9 +99,43 @@ def calculate_exposure_score(evidence_packets):
 
         exposure_level = "LOW"
 
+    # ---------------------------------------------------
+    # BUILD FRAGILITY THEMES
+    # ---------------------------------------------------
+
+    fragility_themes = []
+
+    if total_score >= 40:
+
+        fragility_themes.append(
+            "High concentration of recurring operational fragility indicators detected."
+        )
+
+        fragility_themes.append(
+            "Escalation, rollback, dependency, or readiness instability signals appear repeatedly across evidence sources."
+        )
+
+    elif total_score >= 20:
+
+        fragility_themes.append(
+            "Moderate operational instability patterns detected across uploaded evidence."
+        )
+
+    else:
+
+        fragility_themes.append(
+            "Limited recurring operational fragility currently detected."
+        )
+
+    # ---------------------------------------------------
+    # RETURN RESULTS
+    # ---------------------------------------------------
+
     return {
 
-        "total_score": total_score,
+        "exposure_score": total_score,
 
-        "exposure_level": exposure_level
+        "exposure_level": exposure_level,
+
+        "fragility_themes": fragility_themes
     }

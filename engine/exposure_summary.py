@@ -2,68 +2,72 @@
 # GENERATE EXPOSURE SUMMARY
 # ---------------------------------------------------
 
-def generate_exposure_summary(evidence_packets):
+def generate_exposure_summary(exposure_results):
 
-    signal_counter = {}
+    exposure_level = exposure_results.get(
+        "exposure_level",
+        "UNKNOWN"
+    )
 
-    # ---------------------------------------------------
-    # COUNT SIGNALS
-    # ---------------------------------------------------
+    exposure_score = exposure_results.get(
+        "exposure_score",
+        0
+    )
 
-    for packet in evidence_packets:
-
-        for signal in packet["signal_candidates"]:
-
-            # -------------------------------------------
-            # HANDLE STRUCTURED SIGNAL OBJECTS
-            # -------------------------------------------
-
-            if isinstance(signal, dict):
-
-                signal_name = signal["signal"]
-
-            # -------------------------------------------
-            # HANDLE LEGACY STRING SIGNALS
-            # -------------------------------------------
-
-            else:
-
-                signal_name = signal
-
-            if signal_name not in signal_counter:
-
-                signal_counter[signal_name] = 0
-
-            signal_counter[signal_name] += 1
+    fragility_themes = exposure_results.get(
+        "fragility_themes",
+        []
+    )
 
     # ---------------------------------------------------
-    # BUILD SUMMARY
+    # BUILD INTERPRETATION
     # ---------------------------------------------------
 
-    summary_lines = []
+    if exposure_level == "HIGH":
 
-    for signal, count in signal_counter.items():
-
-        if count >= 3:
-
-            summary_lines.append(
-                f"Repeated operational concern detected around '{signal}' across multiple evidence sources."
-            )
-
-        elif count == 2:
-
-            summary_lines.append(
-                f"Operational concern related to '{signal}' detected in more than one evidence source."
-            )
-
-    # ---------------------------------------------------
-    # FALLBACK
-    # ---------------------------------------------------
-
-    if not summary_lines:
-
-        summary_lines.append(
-            "No major repeated operational fragility patterns detected."
+        interpretation = (
+            "High operational fragility detected across uploaded operational evidence."
         )
 
-    return summary_lines
+    elif exposure_level == "MEDIUM":
+
+        interpretation = (
+            "Moderate operational instability patterns detected across uploaded evidence."
+        )
+
+    else:
+
+        interpretation = (
+            "Limited recurring operational fragility currently detected."
+        )
+
+    # ---------------------------------------------------
+    # BUILD OPERATIONAL SUMMARY
+    # ---------------------------------------------------
+
+    operational_summary = (
+        f"Calculated operational exposure score: "
+        f"{exposure_score}"
+    )
+
+    # ---------------------------------------------------
+    # INCLUDE THEMES
+    # ---------------------------------------------------
+
+    if fragility_themes:
+
+        operational_summary += (
+            "\n\nPrimary operational themes detected:\n- "
+            + "\n- ".join(fragility_themes)
+        )
+
+    # ---------------------------------------------------
+    # RETURN SUMMARY OBJECT
+    # ---------------------------------------------------
+
+    return {
+
+        "exposure_interpretation": interpretation,
+
+        "operational_interpretation": operational_summary
+    }
