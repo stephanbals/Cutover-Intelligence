@@ -21,20 +21,50 @@ RISK_KEYWORDS = [
     "unstable"
 ]
 
+
 # ---------------------------------------------------
 # VALIDATE SIGNALS
 # ---------------------------------------------------
 
-def validate_signals(evidence_packet):
+def validate_signals(evidence_packets):
 
-    text = evidence_packet["normalized_text"].lower()
+    validated_packets = []
 
-    detected_signals = []
+    # ---------------------------------------------------
+    # PROCESS ALL PACKETS
+    # ---------------------------------------------------
 
-    for keyword in RISK_KEYWORDS:
+    for packet in evidence_packets:
 
-        if keyword in text:
+        text = str(
+            packet.get(
+                "normalized_text",
+                ""
+            )
+        ).lower()
 
-            detected_signals.append(keyword)
+        detected_signals = []
 
-    return detected_signals
+        # ---------------------------------------------------
+        # DETECT SIGNAL KEYWORDS
+        # ---------------------------------------------------
+
+        for keyword in RISK_KEYWORDS:
+
+            if keyword in text:
+
+                detected_signals.append(keyword)
+
+        # ---------------------------------------------------
+        # ATTACH SIGNALS TO PACKET
+        # ---------------------------------------------------
+
+        packet["signal_candidates"] = detected_signals
+
+        validated_packets.append(packet)
+
+    # ---------------------------------------------------
+    # RETURN VALIDATED PACKETS
+    # ---------------------------------------------------
+
+    return validated_packets
